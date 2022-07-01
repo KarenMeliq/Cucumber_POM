@@ -2,19 +2,20 @@ import pytest
 from behave import *
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from features.locators import Locators
+from features.locatorsGlobalsQA import LocatorsGlobalsQA
+from features.locatorTestCustomer import LocatorsTestCustomer
 from features.test_datas import TestData
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
+
 import pathlib
 import time
-#from steps.browser import Browser
 
 
 
-class GlobalSqa(Locators, TestData):
 
-
+class GlobalSqa:
+    @pytest.fixture()
     @given('globalsqa home page')
     def open_globalsqa(self):
         driver_path = str(pathlib.Path().resolve()) + "\\resources\\chromedriver.exe"
@@ -22,59 +23,44 @@ class GlobalSqa(Locators, TestData):
         s = Service(driver_path)
         self.driver = webdriver.Chrome(service=s)
         self.driver.get(url)
-        self.driver.implicitly_wait(10)
+        self.driver.implicitly_wait(15)
         self.driver.maximize_window()
-        while (True):
-            pass
-        return self.driver
 
 
 
-
-    @when('Globalsqa home page click on Bank manager login')
+    @when('I click on Bank manager login')
     def click_bank_manager(self):
-        driver = GlobalSqa.open_globalsqa()
-        driver.find_element(By.XPATH, Locators.bank_manager_btn).click()
-        driver.find_element(By.XPATH, Locators.add_customer_btn).click()
+        self.driver.find_element(By.XPATH,LocatorsGlobalsQA.bank_manager_btn).click()
+        self.driver.find_element(By.XPATH, LocatorsGlobalsQA.add_customer_btn).click()
 
 
-    @then('add customers')
-    def add_customer():
-        self.driver.find_element(By.XPATH, Locators.cust_input_name).send_keys(TestData.testname)
-        self.driver.find_element(By.XPATH, Locators.cust_input_lname).send_keys(TestData.testLastName)
-        self.driver.find_element(By.XPATH, Locators.cust_input_postal).send_keys(Locators.testPostalCode)
-        self.driver.find_element(By.XPATH, Locators.add_customer_btn).click()
-
-        iframe = driver.find_element(By.XPATH,pop_up)
-        driver.switch_to.frame(iframe)
-        popUp = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH,)))
-        popUp.click()
-        driver.switch_to.default_content()
+    @then('I click on Add customers')
+    def add_customer(self):
+        self.driver.find_element(By.XPATH, LocatorsGlobalsQA.cust_input_name).\
+            send_keys(TestData.testname)
+        self.driver.find_element(By.XPATH, LocatorsGlobalsQA.cust_input_lname).\
+            send_keys(TestData.testLastName)
+        self.driver.find_element(By.XPATH, LocatorsGlobalsQA.cust_input_postal).\
+            send_keys(TestData.testPostalCode)
+        self.driver.find_element(By.XPATH, LocatorsGlobalsQA.submit_customer).click()
+        self.driver.switch_to.alert.accept()
 
 
-    @then('search the customer on Customers list')
-    def search_customer():
-        self.driver.find_element(By.XPATH, Locators.customers_list_btn).click()
-        cust_list = self.driver.find_element(By.XPATH, Locators.customer_list)
-        return cust_list
+    @then('I Search the customer in the Customers list')
+    def search_customer(self):
+        self.driver.find_element(By.XPATH, LocatorsGlobalsQA.customers).click()
+        inp_field = self.driver.find_element(By.XPATH, LocatorsGlobalsQA.search_field)
+        inp_field.send_keys(TestData.testPostalCode)
 
-    @then('Assert that customer is added with correct info')
-    def test_customer(context):
-        raise NotImplementedError(u'STEP: Then Assert that customer is added with correct info')
+    time.sleep(10)
+    @then('I Delete customer')
+    def remove_customer(self):
+        self.driver.find_element(By.XPATH, LocatorsGlobalsQA.delete_btn).click()
 
-
-    @then('Delete customer')
-    def remove_customer(context):
-        raise NotImplementedError(u'STEP: Then Delete customer')
-
-
-    @then('Assert that customer is deleted')
-    def test_customer_removed(context):
-        raise NotImplementedError(u'STEP: Then Assert that customer is deleted')
+    @then('I close browser')
+    def close_browser(self):
+        self.driver.quit()
 
 
-    @then('close browser')
-    def close_browser(context):
-        raise NotImplementedError(u'STEP: Then close browser')
 
 

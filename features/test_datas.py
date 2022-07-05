@@ -1,5 +1,5 @@
 
-from faker import Faker
+
 
 class TestData:
     #fake = Faker()

@@ -1,5 +1,7 @@
 
-class LocatorsGlobalsQA:
+class PageElementsGlobalsQA:
+    url = "https://www.globalsqa.com/angularJs-protractor/BankingProject/#/login"
+
     #click_bank_manager
     bank_manager_btn = "//button[normalize-space()='Bank Manager Login']"
     add_customer_btn = "//button[normalize-space()='Add Customer']"
